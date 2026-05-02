@@ -1,0 +1,28 @@
+{
+  "os":  "Windows-10-10.0.26200-SP0",
+  "python":  "CPython 3.10.5",
+  "startedAt":  "2026-05-02T15:25:40.903461Z",
+  "program":  "C:\\Users\\Admin\\Documents\\da6401_assignment_3\\train.py",
+  "codePath":  "train.py",
+  "codePathLocal":  "train.py",
+  "git":  {
+    "remote":  "https://github.com/MiRL-IITM/da6401_assignment_3",
+    "commit":  "d74dd923bb5ccabe3fb38926d2d5573e3716233a"
+  },
+  "email":  "ge26z814@smail.iitm.ac.in",
+  "root":  "C:\\Users\\Admin\\Documents\\da6401_assignment_3",
+  "host":  "DESKTOP-DF1C1CV",
+  "executable":  "C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+  "cpu_count":  4,
+  "cpu_count_logical":  8,
+  "disk":  {
+    "/":  {
+      "total":  "254231441408",
+      "used":  "238821457920"
+    }
+  },
+  "memory":  {
+    "total":  "8211902464"
+  },
+  "writerId":  "zms9ilxfwrkedhcr8hnpqml4fjtd24ar"
+}

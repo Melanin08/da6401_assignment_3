@@ -1,0 +1,66 @@
+_wandb:
+    value:
+        cli_version: 0.25.0
+        e:
+            zms9ilxfwrkedhcr8hnpqml4fjtd24ar:
+                codePath: train.py
+                codePathLocal: train.py
+                cpu_count: 4
+                cpu_count_logical: 8
+                disk:
+                    /:
+                        total: "254231441408"
+                        used: "238821457920"
+                email: ge26z814@smail.iitm.ac.in
+                executable: C:\Users\Admin\AppData\Local\Programs\Python\Python310\python.exe
+                git:
+                    commit: d74dd923bb5ccabe3fb38926d2d5573e3716233a
+                    remote: https://github.com/MiRL-IITM/da6401_assignment_3
+                host: DESKTOP-DF1C1CV
+                memory:
+                    total: "8211902464"
+                os: Windows-10-10.0.26200-SP0
+                program: C:\Users\Admin\Documents\da6401_assignment_3\train.py
+                python: CPython 3.10.5
+                root: C:\Users\Admin\Documents\da6401_assignment_3
+                startedAt: "2026-05-02T15:25:40.903461Z"
+                writerId: zms9ilxfwrkedhcr8hnpqml4fjtd24ar
+        m: []
+        python_version: 3.10.5
+        t:
+            "1":
+                - 1
+                - 33
+                - 49
+                - 51
+            "2":
+                - 1
+                - 33
+                - 49
+                - 51
+            "3":
+                - 16
+            "4": 3.10.5
+            "5": 0.25.0
+            "8":
+                - 3
+            "12": 0.25.0
+            "13": windows-amd64
+"N":
+    value: 6
+batch_size:
+    value: 64
+d_ff:
+    value: 2048
+d_model:
+    value: 512
+dropout:
+    value: 0.1
+num_epochs:
+    value: 10
+num_heads:
+    value: 8
+smoothing:
+    value: 0.1
+warmup_steps:
+    value: 4000

@@ -1,0 +1,65 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+README.md: 1.15kB [00:00, 1.30MB/s]
+C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\huggingface_hub\file_download.py:138: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\Admin\.cache\huggingface\hub\datasets--bentrevett--multi30k. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+train.jsonl: 4.60MB [00:00, 14.6MB/s]
+val.jsonl: 164kB [00:00, 31.2MB/s]
+test.jsonl: 156kB [00:00, 31.0MB/s]
+Generating train split: 100%|██| 29000/29000 [00:00<00:00, 685008.00 examples/s]
+Generating validation split: 100%|█| 1014/1014 [00:00<00:00, 89371.78 examples/s
+Generating test split: 100%|██████| 1000/1000 [00:00<00:00, 93937.38 examples/s]
+Traceback (most recent call last):
+  File "C:\Users\Admin\Documents\da6401_assignment_3\train.py", line 338, in <module>
+    run_training_experiment()
+  File "C:\Users\Admin\Documents\da6401_assignment_3\train.py", line 301, in run_training_experiment
+    train_data = Multi30kDataset("train")
+  File "C:\Users\Admin\Documents\da6401_assignment_3\dataset.py", line 59, in __init__
+    Multi30kDataset._vocab_cache = self.build_vocab()
+  File "C:\Users\Admin\Documents\da6401_assignment_3\dataset.py", line 97, in build_vocab
+    tgt_tokens.append(self._tokenize_en(en_text))
+  File "C:\Users\Admin\Documents\da6401_assignment_3\dataset.py", line 83, in _tokenize_en
+    return [token.lower_ for token in self.tokenizer_en(text)]
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\spacy\language.py", line 1053, in __call__
+    doc = proc(doc, **component_cfg.get(name, {}))  # type: ignore[call-arg]
+  File "spacy/pipeline/trainable_pipe.pyx", line 52, in spacy.pipeline.trainable_pipe.TrainablePipe.__call__
+  File "spacy/pipeline/transition_parser.pyx", line 264, in spacy.pipeline.transition_parser.Parser.predict
+  File "spacy/pipeline/transition_parser.pyx", line 285, in spacy.pipeline.transition_parser.Parser.greedy_parse
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\thinc\model.py", line 334, in predict
+    return self._func(self, X, is_train=False)[0]
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\spacy\ml\tb_framework.py", line 33, in forward
+    step_model = ParserStepModel(
+  File "spacy/ml/parser_model.pyx", line 257, in spacy.ml.parser_model.ParserStepModel.__init__
+  File "spacy/ml/parser_model.pyx", line 398, in spacy.ml.parser_model.precompute_hiddens.__init__
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\thinc\model.py", line 310, in __call__
+    return self._func(self, X, is_train=is_train)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\spacy\ml\_precomputable_affine.py", line 26, in forward
+    model.ops.gemm(X, W.reshape((nF * nO * nP, nI)), trans2=True, out=Yf[1:])
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\Admin\Documents\da6401_assignment_3\train.py", line 338, in <module>
+    run_training_experiment()
+  File "C:\Users\Admin\Documents\da6401_assignment_3\train.py", line 301, in run_training_experiment
+    train_data = Multi30kDataset("train")
+  File "C:\Users\Admin\Documents\da6401_assignment_3\dataset.py", line 59, in __init__
+    Multi30kDataset._vocab_cache = self.build_vocab()
+  File "C:\Users\Admin\Documents\da6401_assignment_3\dataset.py", line 97, in build_vocab
+    tgt_tokens.append(self._tokenize_en(en_text))
+  File "C:\Users\Admin\Documents\da6401_assignment_3\dataset.py", line 83, in _tokenize_en
+    return [token.lower_ for token in self.tokenizer_en(text)]
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\spacy\language.py", line 1053, in __call__
+    doc = proc(doc, **component_cfg.get(name, {}))  # type: ignore[call-arg]
+  File "spacy/pipeline/trainable_pipe.pyx", line 52, in spacy.pipeline.trainable_pipe.TrainablePipe.__call__
+  File "spacy/pipeline/transition_parser.pyx", line 264, in spacy.pipeline.transition_parser.Parser.predict
+  File "spacy/pipeline/transition_parser.pyx", line 285, in spacy.pipeline.transition_parser.Parser.greedy_parse
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\thinc\model.py", line 334, in predict
+    return self._func(self, X, is_train=False)[0]
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\spacy\ml\tb_framework.py", line 33, in forward
+    step_model = ParserStepModel(
+  File "spacy/ml/parser_model.pyx", line 257, in spacy.ml.parser_model.ParserStepModel.__init__
+  File "spacy/ml/parser_model.pyx", line 398, in spacy.ml.parser_model.precompute_hiddens.__init__
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\thinc\model.py", line 310, in __call__
+    return self._func(self, X, is_train=is_train)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\spacy\ml\_precomputable_affine.py", line 26, in forward
+    model.ops.gemm(X, W.reshape((nF * nO * nP, nI)), trans2=True, out=Yf[1:])
+KeyboardInterrupt
