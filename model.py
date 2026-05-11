@@ -20,7 +20,10 @@ import torch.nn.functional as F
 
 DEFAULT_CHECKPOINT_PATH = "checkpoint.pt"
 # Replace this with your Google Drive sharing URL or file id before submission.
-DEFAULT_CHECKPOINT_URL = os.environ.get("TRANSFORMER_CHECKPOINT_URL", "")
+DEFAULT_CHECKPOINT_URL = os.environ.get(
+    "TRANSFORMER_CHECKPOINT_URL",
+    "https://drive.google.com/file/d/1imdff6iYoDwl3wPVBHDk4ePxnK0R5HfK/view?usp=sharing",
+)
 
 
 def scaled_dot_product_attention(
