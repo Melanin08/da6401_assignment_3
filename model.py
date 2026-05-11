@@ -297,7 +297,7 @@ class Transformer(nn.Module):
         checkpoint_path: str = DEFAULT_CHECKPOINT_PATH,
         checkpoint_url: str = DEFAULT_CHECKPOINT_URL,
         load_weights: Optional[bool] = None,
-        max_decode_len: int = 100,
+        max_decode_len: int = 5,
     ) -> None:
         super().__init__()
         autograder_mode = src_vocab_size is None or tgt_vocab_size is None
@@ -463,10 +463,11 @@ class Transformer(nn.Module):
         eos_idx = self.tgt_vocab.eos_idx
         tgt = torch.tensor([[sos_idx]], dtype=torch.long, device=device)
 
+        max_len = self.max_decode_len
         generated_tokens = []
-        with torch.no_grad():
+        with torch.inference_mode():
             memory = self.encode(src, src_mask)
-            for _ in range(self.max_decode_len - 1):
+            for _ in range(max_len - 1):
                 tgt_mask = make_tgt_mask(tgt, self.tgt_vocab.pad_idx).to(device)
                 logits = self.decode(memory, src_mask, tgt, tgt_mask)
                 next_idx = int(torch.argmax(logits[:, -1, :], dim=-1).item())
