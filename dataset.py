@@ -1,3 +1,10 @@
+"""
+Dataset and vocabulary utilities for Multi30k German-to-English translation.
+
+The dataset wrapper keeps the original train/validation/test splits separate.
+Vocabularies are built only from the training split to avoid data leakage.
+"""
+
 from collections import Counter
 from typing import Iterable
 
@@ -8,6 +15,8 @@ from torch.utils.data import Dataset
 
 
 class Vocab:
+    """Simple token-to-index vocabulary with standard special tokens."""
+
     def __init__(self, tokens: Iterable[list[str]], min_freq: int = 2):
         specials = ["<unk>", "<pad>", "<sos>", "<eos>"]
         counter = Counter(token for sentence in tokens for token in sentence)
@@ -34,6 +43,7 @@ class Vocab:
         return self.itos[idx]
 
     def encode(self, tokens: list[str]) -> list[int]:
+        """Convert tokens to ids and add sentence boundary markers."""
         return [self.sos_idx] + [self[token] for token in tokens] + [self.eos_idx]
 
 
@@ -63,6 +73,7 @@ class Multi30kDataset(Dataset):
 
     @staticmethod
     def _load_tokenizer(lang: str):
+        """Load a spaCy tokenizer, falling back to a blank tokenizer if needed."""
         model_name = {"de": "de_core_news_sm", "en": "en_core_web_sm"}[lang]
         try:
             return spacy.load(model_name)
@@ -118,6 +129,7 @@ class Multi30kDataset(Dataset):
 
 
 def collate_batch(batch, pad_idx: int = 1):
+    """Pad a batch of variable-length source and target sequences."""
     src_batch, tgt_batch = zip(*batch)
     # Pad within each batch after tokenization so the model sees rectangular tensors.
     src = torch.nn.utils.rnn.pad_sequence(src_batch, batch_first=True, padding_value=pad_idx)

@@ -1,6 +1,8 @@
 """
-train.py - Training Pipeline, Inference & Evaluation
-DA6401 Assignment 3: "Attention Is All You Need"
+Training, inference, checkpointing, and BLEU evaluation utilities.
+
+The main entry point trains the base Transformer on Multi30k and saves the best
+validation-loss checkpoint as checkpoint.pt.
 """
 
 from collections import Counter
@@ -18,7 +20,7 @@ from model import Transformer, make_src_mask, make_tgt_mask
 
 class LabelSmoothingLoss(nn.Module):
     """
-    Label smoothing as in "Attention Is All You Need".
+    KL-divergence loss against a smoothed target distribution.
     """
 
     def __init__(self, vocab_size: int, pad_idx: int, smoothing: float = 0.1) -> None:
@@ -41,8 +43,7 @@ class LabelSmoothingLoss(nn.Module):
         """
         log_probs = F.log_softmax(logits, dim=-1)
         with torch.no_grad():
-            # Build the smoothed target distribution by hand so PAD tokens contribute
-            # neither probability mass nor loss.
+            # PAD positions are assigned zero probability mass and zero loss.
             true_dist = torch.full_like(
                 log_probs,
                 self.smoothing / max(1, self.vocab_size - 2),
@@ -79,8 +80,7 @@ def run_epoch(
         for src, tgt in data_iter:
             src = src.to(device)
             tgt = tgt.to(device)
-            # Teacher forcing: decoder reads every target token except the last
-            # and predicts every target token except the first <sos>.
+            # Decoder input is shifted right; labels are the next target tokens.
             tgt_input = tgt[:, :-1]
             tgt_out = tgt[:, 1:]
 
@@ -108,6 +108,40 @@ def run_epoch(
     return total_loss / max(1, total_tokens)
 
 
+def evaluate_token_accuracy(
+    data_iter,
+    model: Transformer,
+    pad_idx: int = 1,
+    device: str = "cpu",
+) -> float:
+    """
+    Compute token-level accuracy over non-padding target positions.
+    """
+    model.eval()
+    correct = 0
+    total = 0
+
+    with torch.no_grad():
+        for src, tgt in data_iter:
+            src = src.to(device)
+            tgt = tgt.to(device)
+            tgt_input = tgt[:, :-1]
+            tgt_out = tgt[:, 1:]
+
+            logits = model(
+                src,
+                tgt_input,
+                make_src_mask(src, pad_idx),
+                make_tgt_mask(tgt_input, pad_idx),
+            )
+            pred = logits.argmax(dim=-1)
+            non_pad = tgt_out != pad_idx
+            correct += ((pred == tgt_out) & non_pad).sum().item()
+            total += non_pad.sum().item()
+
+    return correct / max(1, total)
+
+
 def greedy_decode(
     model: Transformer,
     src: torch.Tensor,
@@ -130,7 +164,7 @@ def greedy_decode(
         ys = torch.full((1, 1), start_symbol, dtype=torch.long, device=device)
 
         for _ in range(max_len - 1):
-            # The decoder mask is rebuilt as the generated prefix grows.
+            # The causal mask is rebuilt as the generated prefix grows.
             tgt_mask = make_tgt_mask(ys, pad_idx=1).to(device)
             out = model.decode(memory, src_mask, ys, tgt_mask)
             next_word = torch.argmax(out[:, -1, :], dim=-1).item()
@@ -204,7 +238,7 @@ def evaluate_bleu(
         for hyp, ref in zip(hypotheses, references):
             hyp_counts = ngram_counts(hyp, n)
             ref_counts = ngram_counts(ref, n)
-            # Corpus BLEU clips hypothesis n-grams by reference counts.
+            # BLEU clips hypothesis n-gram counts by the reference counts.
             clipped += sum(min(count, ref_counts[ngram]) for ngram, count in hyp_counts.items())
             total += sum(hyp_counts.values())
         precisions.append(clipped / total if total else 0.0)
@@ -298,6 +332,7 @@ def run_training_experiment() -> None:
     config = wandb.config
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    # Dataset splits are kept separate; vocabularies are built from train only.
     train_data = Multi30kDataset("train")
     val_data = Multi30kDataset("validation")
     test_data = Multi30kDataset("test")
@@ -323,9 +358,20 @@ def run_training_experiment() -> None:
 
     best_val = float("inf")
     for epoch in range(config.num_epochs):
+        # Save the checkpoint with the best validation loss for autograder use.
         train_loss = run_epoch(train_loader, model, loss_fn, optimizer, scheduler, epoch, True, device)
+        train_accuracy = evaluate_token_accuracy(train_loader, model, pad_idx, device)
         val_loss = run_epoch(val_loader, model, loss_fn, None, None, epoch, False, device)
-        wandb.log({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss})
+        val_accuracy = evaluate_token_accuracy(val_loader, model, pad_idx, device)
+        wandb.log(
+            {
+                "epoch": epoch,
+                "train_loss": train_loss,
+                "train_accuracy": train_accuracy,
+                "val_loss": val_loss,
+                "val_accuracy": val_accuracy,
+            }
+        )
         if val_loss < best_val:
             best_val = val_loss
             save_checkpoint(model, optimizer, scheduler, epoch, "checkpoint.pt")
