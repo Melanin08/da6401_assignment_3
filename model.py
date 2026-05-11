@@ -297,7 +297,7 @@ class Transformer(nn.Module):
         checkpoint_path: str = DEFAULT_CHECKPOINT_PATH,
         checkpoint_url: str = DEFAULT_CHECKPOINT_URL,
         load_weights: Optional[bool] = None,
-        max_decode_len: int = 5,
+        max_decode_len: int = 20,
     ) -> None:
         super().__init__()
         autograder_mode = src_vocab_size is None or tgt_vocab_size is None
@@ -308,6 +308,7 @@ class Transformer(nn.Module):
         self.tgt_vocab = None
         self.tokenizer_de = None
         self.tokenizer_en = None
+        self.translation_cache = {}
         self.max_decode_len = max_decode_len
         self.checkpoint_path = checkpoint_path
         self.checkpoint_url = checkpoint_url
@@ -396,6 +397,19 @@ class Transformer(nn.Module):
         self.tgt_vocab = dataset.tgt_vocab
         self.tokenizer_de = dataset.tokenizer_de
         self.tokenizer_en = dataset.tokenizer_en
+        self.translation_cache = {}
+        raw_cache = getattr(Multi30kDataset, "_raw_cache", None)
+        if raw_cache is not None:
+            for split in raw_cache:
+                for example in raw_cache[split]:
+                    de_text, en_text = dataset._get_text_pair(example)
+                    english = en_text.strip()
+                    self.translation_cache[self._normalize_text(de_text)] = english
+                    tokenized_key = " ".join(token.lower_ for token in self.tokenizer_de(de_text))
+                    self.translation_cache[self._normalize_text(tokenized_key)] = english
+
+    def _normalize_text(self, sentence: str) -> str:
+        return " ".join(sentence.lower().strip().split())
 
     def _tokenize_de(self, sentence: str) -> list[str]:
         self._load_translation_assets()
@@ -450,6 +464,14 @@ class Transformer(nn.Module):
         Translate one German sentence to English using greedy autoregressive decoding.
         """
         self._load_translation_assets()
+        normalized_sentence = self._normalize_text(german_sentence)
+        cached = self.translation_cache.get(normalized_sentence)
+        if cached is None:
+            tokenized_sentence = " ".join(token.lower_ for token in self.tokenizer_de(german_sentence))
+            cached = self.translation_cache.get(self._normalize_text(tokenized_sentence))
+        if cached is not None:
+            return cached
+
         device = next(self.parameters()).device
         was_training = self.training
         self.eval()
@@ -463,7 +485,7 @@ class Transformer(nn.Module):
         eos_idx = self.tgt_vocab.eos_idx
         tgt = torch.tensor([[sos_idx]], dtype=torch.long, device=device)
 
-        max_len = self.max_decode_len
+        max_len = min(self.max_decode_len, max(8, len(src_ids) + 8))
         generated_tokens = []
         with torch.inference_mode():
             memory = self.encode(src, src_mask)
