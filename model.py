@@ -22,7 +22,7 @@ DEFAULT_CHECKPOINT_PATH = "checkpoint.pt"
 # Replace this with your Google Drive sharing URL or file id before submission.
 DEFAULT_CHECKPOINT_URL = os.environ.get(
     "TRANSFORMER_CHECKPOINT_URL",
-    "https://drive.google.com/file/d/1imdff6iYoDwl3wPVBHDk4ePxnK0R5HfK/view?usp=sharing",
+    "https://drive.google.com/file/d/1O50eVy2R9fgJ95Xw4aB-UU5jpp2hcMP8/view?usp=sharing",
 )
 
 
@@ -379,7 +379,7 @@ class Transformer(nn.Module):
                     "gdown is required to download the trained checkpoint. "
                     "Install it or add it to requirements.txt."
                 ) from exc
-            gdown.download(checkpoint_url, str(path), quiet=False, fuzzy=True)
+            gdown.download(checkpoint_url, str(path), quiet=False)
 
         checkpoint = torch.load(path, map_location="cpu")
         if "model_state_dict" not in checkpoint:
