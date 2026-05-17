@@ -3,8 +3,8 @@ Section 2.3: Attention-head visualization.
 
 This script loads a trained checkpoint, extracts attention weights from the last
 encoder layer, and logs one heat map per head to W&B. Additional per-head
-statistics summarize local attention, adjacent-token attention, and average
-attention distance for the report discussion.
+statistics summarize local attention, adjacent-token attention, average
+attention distance, and head redundancy for the report discussion.
 """
 
 import argparse
@@ -12,6 +12,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import torch
+import torch.nn.functional as F
 import wandb
 
 from dataset import Multi30kDataset
@@ -87,7 +88,6 @@ def attention_statistics(attn: torch.Tensor) -> dict[str, float]:
 
 def make_heatmap(attn, labels, title: str):
     """Create a labeled heat map for a single attention head."""
-
     fig, ax = plt.subplots(figsize=(8, 7))
 
     image = ax.imshow(
@@ -98,7 +98,6 @@ def make_heatmap(attn, labels, title: str):
     )
 
     ax.set_title(title)
-
     ax.set_xlabel("Key tokens")
     ax.set_ylabel("Query tokens")
 
@@ -109,7 +108,6 @@ def make_heatmap(attn, labels, title: str):
     ax.set_yticklabels(labels)
 
     fig.colorbar(image, ax=ax, fraction=0.046, pad=0.04)
-
     fig.tight_layout()
 
     return fig
@@ -124,7 +122,6 @@ def log_last_encoder_attention(
 ) -> None:
 
     src = src.to(device)
-
     src_mask = make_src_mask(src, pad_idx).to(device)
 
     with torch.no_grad():
@@ -141,15 +138,18 @@ def log_last_encoder_attention(
 
     attn = attn.squeeze(0).detach().cpu()
 
+    all_heads = []
+
     for head_idx in range(attn.size(0)):
 
         # Each head is logged separately so it can be inspected.
         head_attn = attn[head_idx]
+        all_heads.append(head_attn)
 
         stats = attention_statistics(head_attn)
 
         # Combined statistics across heads
-        # for W&B comparison plots
+        # for W&B comparison plots.
         wandb.log({
             "head_index": head_idx,
             "diagonal_attention": stats["diagonal_attention"],
@@ -176,8 +176,52 @@ def log_last_encoder_attention(
         })
 
         wandb.log(log_data)
-
         plt.close(fig)
+
+    # Pairwise head similarity heatmap for redundancy analysis.
+    # Bright off-diagonal cells mean two heads have similar attention patterns.
+    head_vectors = torch.stack([
+        head.reshape(-1)
+        for head in all_heads
+    ])
+
+    similarity_matrix = F.cosine_similarity(
+        head_vectors.unsqueeze(1),
+        head_vectors.unsqueeze(0),
+        dim=-1,
+    )
+
+    fig_sim, ax = plt.subplots(figsize=(7, 6))
+
+    image = ax.imshow(
+        similarity_matrix.numpy(),
+        cmap="viridis",
+        vmin=0.0,
+        vmax=1.0
+    )
+
+    ax.set_title("Pairwise Attention Head Similarity")
+    ax.set_xlabel("Head Index")
+    ax.set_ylabel("Head Index")
+
+    ax.set_xticks(range(attn.size(0)))
+    ax.set_yticks(range(attn.size(0)))
+
+    fig_sim.colorbar(
+        image,
+        ax=ax,
+        fraction=0.046,
+        pad=0.04,
+        label="Cosine similarity"
+    )
+
+    fig_sim.tight_layout()
+
+    wandb.log({
+        "head_redundancy_heatmap": wandb.Image(fig_sim)
+    })
+
+    plt.close(fig_sim)
 
 
 def main() -> None:
