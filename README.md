@@ -1,28 +1,43 @@
 # DA6401 Assignment 3
-
 ## Implementing a Transformer for Machine Translation
 
-This project implements the Transformer architecture from **Attention Is All You
-Need** for German-to-English translation on the Multi30k dataset. The model is
-built from basic PyTorch components and follows the encoder-decoder structure
-described in the paper.
+This project implements the Transformer architecture from the paper **Attention Is All You Need** using PyTorch for German-to-English machine translation on the Multi30k dataset.
 
-## Submission Links
+The implementation was built completely from scratch using basic PyTorch modules such as `nn.Linear` and `nn.Module`. The project does not use `torch.nn.MultiheadAttention` or `torch.nn.Transformer`.
 
-GitHub repository:
+The implementation includes:
 
-https://github.com/Melanin08/da6401_assignment_3.git
+- Scaled Dot-Product Attention
+- Multi-Head Attention
+- Encoder and Decoder stacks
+- Sinusoidal Positional Encoding
+- Padding and Causal Masking
+- Label Smoothing
+- Noam Learning Rate Scheduler
+- Greedy Decoding
+- BLEU Score Evaluation
+- Weights & Biases experiment tracking
 
-Public W&B report:
+---
 
-https://wandb.ai/ge26z814-iitm-india/da6401_assignment_3/reports/Implementing-the-Transformer-for-Machine-Translation--VmlldzoxNjc0NzExOA?accessToken=qk9h8nc9llh6h3g118olcar8gy9wpmn9wktd8tjfu4225ynoa3nhc4x1bn5zx339
+# Dataset
 
-The implementation includes attention, masking, positional encoding, encoder and
-decoder stacks, label smoothing, the Noam learning-rate scheduler, greedy
-decoding, checkpointing, BLEU evaluation, and the W&B experiments required for
-the report.
+The model is trained on the **Multi30k** dataset.
 
-## Repository Structure
+Dataset statistics:
+
+- 29,000 training sentence pairs
+- 1,014 validation sentence pairs
+- 1,000 test sentence pairs
+
+Source language: German  
+Target language: English
+
+The dataset is loaded using the Hugging Face `datasets` library.
+
+---
+
+# Repository Structure
 
 ```text
 .
@@ -39,100 +54,126 @@ the report.
 └── README.md
 ```
 
-## Main Files
+---
 
-### `model.py`
+# Main Files
 
-Contains the Transformer implementation:
+## model.py
 
-- scaled dot-product attention
-- multi-head attention
-- source and target masks
-- sinusoidal positional encoding
-- feed-forward network
-- encoder layer and decoder layer
-- encoder stack and decoder stack
-- full `Transformer` model
+Contains the complete Transformer implementation.
 
-The code does not use `torch.nn.MultiheadAttention` or `nn.Transformer`.
+Implemented components:
 
-### `dataset.py`
+- Scaled Dot-Product Attention
+- Multi-Head Attention
+- Feed Forward Network
+- Positional Encoding
+- Encoder Layer
+- Decoder Layer
+- Encoder Stack
+- Decoder Stack
+- Transformer Model
+- Source Mask
+- Target Mask
 
-Loads the Multi30k dataset from Hugging Face and prepares it for training.
+The implementation follows the architecture described in the original Transformer paper.
 
-It handles:
+---
+
+## dataset.py
+
+Handles dataset loading and preprocessing.
+
+Features:
 
 - German and English tokenization using spaCy
-- vocabulary creation
-- special tokens: `<unk>`, `<pad>`, `<sos>`, `<eos>`
-- conversion from text to token ids
-- batch padding
+- Vocabulary construction
+- Batch padding
+- Text to token-id conversion
 
-The vocabulary is built only from the training split.
+Special tokens used:
 
-### `lr_scheduler.py`
+```text
+<pad>
+<unk>
+<sos>
+<eos>
+```
 
-Implements the Noam learning-rate schedule:
+---
+
+## lr_scheduler.py
+
+Implements the Noam learning rate scheduler.
+
+Formula:
 
 ```text
 lr = d_model^(-0.5) * min(step^(-0.5), step * warmup_steps^(-1.5))
 ```
 
-### `train.py`
+---
 
-Runs the main training pipeline.
+## train.py
 
-It includes:
+Runs the main Transformer training pipeline.
 
-- label smoothing
-- training and validation loop
-- greedy decoding
+Features:
+
+- Training loop
+- Validation loop
 - BLEU evaluation
-- checkpoint saving and loading
+- Label smoothing
+- Greedy decoding
+- Checkpoint saving
 - W&B logging
 
-The main checkpoint saved by this file is:
+Main checkpoint:
 
 ```text
 checkpoint.pt
 ```
 
-This is the checkpoint intended for the main test-set evaluation.
+---
 
-## Installation
+# Installation
 
 Install dependencies:
 
-```powershell
-python -m pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
 ```
 
-Log in to W&B:
+Login to Weights & Biases:
 
-```powershell
+```bash
 wandb login
 ```
 
-## Running the Main Model
+---
 
-Train the main Transformer model:
+# Training the Main Model
 
-```powershell
+Run:
+
+```bash
 python train.py
 ```
 
-This will train the model, save `checkpoint.pt`, evaluate BLEU, and log results
-to the W&B project:
+This will:
 
-```text
-da6401_assignment_3
-```
+- Train the Transformer model
+- Save the best checkpoint
+- Evaluate BLEU score
+- Log metrics to W&B
 
-## Quick Check
+---
 
-To check that the model runs:
+# Quick Model Test
 
-```powershell
+Run:
+
+```bash
 python -c "import torch; from model import Transformer, make_src_mask, make_tgt_mask; src=torch.tensor([[2,4,5,1]]); tgt=torch.tensor([[2,7,8,1]]); model=Transformer(20,30,d_model=32,N=2,num_heads=4,d_ff=64); out=model(src,tgt,make_src_mask(src),make_tgt_mask(tgt)); print(out.shape)"
 ```
 
@@ -142,99 +183,219 @@ Expected output:
 torch.Size([1, 4, 30])
 ```
 
-## W&B Report Scripts
+---
 
-The assignment report has five experiments. Each experiment has a separate
-script.
+# Weights & Biases Experiments
 
-### 2.1 Noam Scheduler vs Fixed Learning Rate
+The assignment includes five W&B experiments.
 
-```powershell
+---
+
+# 2.1 Noam Scheduler vs Fixed Learning Rate
+
+Run:
+
+```bash
 python q2_1_noam_vs_fixed.py
 ```
 
-Compares:
+Comparison:
 
-- Noam scheduler
-- fixed learning rate `1e-4`
+- Noam Scheduler
+- Fixed Learning Rate
 
-Logs:
+Logged metrics:
 
-- training loss
-- training accuracy
-- validation accuracy
-- validation loss
-- learning rate
+- Training loss
+- Validation loss
+- Training accuracy
+- Validation accuracy
+- Learning rate
 
-### 2.2 Scaling Factor Ablation
+Goal:
 
-```powershell
+Study how the Noam scheduler stabilizes Transformer training during the early training phase.
+
+---
+
+# 2.2 Scaling Factor Ablation
+
+Run:
+
+```bash
 python q2_2_scaling_ablation.py
 ```
 
-Compares:
+Comparison:
 
-- attention with `1 / sqrt(d_k)`
-- attention without the scaling factor
+- Attention with scaling factor `1/sqrt(d_k)`
+- Attention without scaling factor
 
-Logs Query and Key gradient norms during the first 1000 steps.
+Logged metrics:
 
-### 2.3 Attention Head Visualization
+- Query gradient norms
+- Key gradient norms
+- Training loss
+- Validation loss
 
-```powershell
+Goal:
+
+Analyze how the scaling factor prevents softmax saturation and vanishing gradients.
+
+---
+
+# 2.3 Attention Head Visualization
+
+Run:
+
+```bash
 python q2_3_attention_heads.py
 ```
 
-This requires a trained `checkpoint.pt`.
-
-It logs heatmaps for each attention head in the last encoder layer.
-
-To visualize a custom German sentence:
-
-```powershell
-python q2_3_attention_heads.py --sentence "ein mann in einem roten hemd spielt gitarre ."
-```
-
-### 2.4 Sinusoidal vs Learned Positional Encoding
-
-```powershell
-python q2_4_positional_encoding_ablation.py
-```
-
-Compares:
-
-- sinusoidal positional encoding
-- learned positional embeddings
-
-Logs validation BLEU for both settings.
-
-### 2.5 Label Smoothing
-
-```powershell
-python q2_5_label_smoothing.py
-```
-
-Compares:
-
-- label smoothing `epsilon = 0.1`
-- label smoothing `epsilon = 0.0`
-
-Logs prediction confidence, training loss, and validation loss.
-
-## Checkpoints
-
-The main checkpoint is:
+This experiment requires:
 
 ```text
 checkpoint.pt
 ```
 
-The report scripts save separate checkpoints for their own comparisons. These
-are useful for analysis, but `checkpoint.pt` is the main model checkpoint.
+Optional custom sentence:
 
-## Notes
+```bash
+python q2_3_attention_heads.py --sentence "ein mann in einem roten hemd spielt gitarre ."
+```
 
-- The main model uses `d_model=512`, `N=6`, `num_heads=8`, and `d_ff=2048`.
-- The implementation uses Post-LayerNorm: `LayerNorm(x + Sublayer(x))`.
-- Multi30k is downloaded through the `datasets` library.
-- W&B runs are logged under the project `da6401_assignment_3`.
+Logged outputs:
+
+- Heatmap for each attention head
+- Diagonal attention
+- Next-token attention
+- Previous-token attention
+- Expected attention distance
+- Attention entropy
+
+Goal:
+
+Analyze whether different heads learn specialized behaviors and investigate head redundancy.
+
+---
+
+# 2.4 Positional Encoding vs Learned Embeddings
+
+Run:
+
+```bash
+python q2_4_positional_encoding_ablation.py
+```
+
+Comparison:
+
+- Sinusoidal positional encoding
+- Learned positional embeddings
+
+Logged outputs:
+
+- Validation BLEU score
+- Training loss
+- Validation loss
+- Best validation BLEU comparison
+- Positional encoding heatmaps
+
+Goal:
+
+Compare positional encoding methods and analyze why sinusoidal encoding can generalize to longer sequences.
+
+---
+
+# 2.5 Label Smoothing
+
+Run:
+
+```bash
+python q2_5_label_smoothing.py
+```
+
+Comparison:
+
+- Label smoothing `ϵ = 0.1`
+- Standard Cross-Entropy `ϵ = 0.0`
+
+Logged outputs:
+
+- Prediction confidence
+- Training loss
+- Validation loss
+
+Goal:
+
+Analyze how label smoothing prevents over-confident predictions and improves generalization.
+
+---
+
+# Checkpoints
+
+Main checkpoint:
+
+```text
+checkpoint.pt
+```
+
+Experiment checkpoints:
+
+```text
+checkpoint_2_4_sinusoidal.pt
+checkpoint_2_4_learned.pt
+checkpoint_2_5_eps_0.1.pt
+checkpoint_2_5_eps_0.0.pt
+```
+
+---
+
+# Model Configuration
+
+Main Transformer settings:
+
+```text
+d_model = 512
+N = 6
+num_heads = 8
+d_ff = 2048
+dropout = 0.1
+```
+
+Layer normalization style:
+
+```text
+Post-LayerNorm
+```
+
+---
+
+# GitHub Repository
+
+```text
+https://github.com/Melanin08/da6401_assignment_3.git
+```
+
+---
+
+# Public W&B Report
+
+```text
+https://wandb.ai/ge26z814-iitm-india/da6401_assignment_3/reports/Implementing-the-Transformer-for-Machine-Translation--VmlldzoxNjc0NzExOA
+```
+
+---
+
+# References
+
+Transformer paper:
+
+```text
+https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf
+```
+
+Multi30k dataset:
+
+```text
+https://huggingface.co/datasets/bentrevett/multi30k
+```
