@@ -11,14 +11,12 @@ described in the paper.
 
 GitHub repository:
 
-```text
-PASTE_REPOSITORY_LINK_HERE
-```
+https://github.com/Melanin08/da6401_assignment_3.git
 
 Public W&B report:
 
 ```text
-[PASTE_WANDB_REPORT_LINK_HERE](https://wandb.ai/ge26z814-iitm-india/da6401_assignment_3/reports/Implementing-the-Transformer-for-Machine-Translation--VmlldzoxNjc0NzExOA?accessToken=qk9h8nc9llh6h3g118olcar8gy9wpmn9wktd8tjfu4225ynoa3nhc4x1bn5zx339)
+https://wandb.ai/ge26z814-iitm-india/da6401_assignment_3/reports/Implementing-the-Transformer-for-Machine-Translation--VmlldzoxNjc0NzExOA?accessToken=qk9h8nc9llh6h3g118olcar8gy9wpmn9wktd8tjfu4225ynoa3nhc4x1bn5zx339
 ```
 
 The implementation includes attention, masking, positional encoding, encoder and
