@@ -372,17 +372,15 @@ Post-LayerNorm
 
 # GitHub Repository
 
-```text
 https://github.com/Melanin08/da6401_assignment_3.git
-```
+
 
 ---
 
 # Public W&B Report
 
-```text
 https://wandb.ai/ge26z814-iitm-india/da6401_assignment_3/reports/Implementing-the-Transformer-for-Machine-Translation--VmlldzoxNjc0NzExOA
-```
+
 
 ---
 
@@ -390,12 +388,9 @@ https://wandb.ai/ge26z814-iitm-india/da6401_assignment_3/reports/Implementing-th
 
 Transformer paper:
 
-```text
 https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf
-```
 
 Multi30k dataset:
 
-```text
 https://huggingface.co/datasets/bentrevett/multi30k
-```
+
