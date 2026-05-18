@@ -379,7 +379,7 @@ https://github.com/Melanin08/da6401_assignment_3.git
 
 # Public W&B Report
 
-https://wandb.ai/ge26z814-iitm-india/da6401_assignment_3/reports/Implementing-the-Transformer-for-Machine-Translation--VmlldzoxNjc0NzExOA
+[https://wandb.ai/ge26z814-iitm-india/da6401_assignment_3/reports/Implementing-the-Transformer-for-Machine-Translation--VmlldzoxNjc0NzExOA](https://wandb.ai/ge26z814-iitm-india/da6401_assignment_3/reports/Implementing-the-Transformer-for-Machine-Translation--VmlldzoxNjc0NzExOA?accessToken=qk9h8nc9llh6h3g118olcar8gy9wpmn9wktd8tjfu4225ynoa3nhc4x1bn5zx339)
 
 
 ---
