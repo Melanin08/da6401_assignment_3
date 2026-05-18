@@ -27,7 +27,7 @@ BASE_CONFIG = {
     "d_ff": 2048,
     "dropout": 0.1,
     "warmup_steps": 4000,
-    "fixed_lr": 1e-3,
+    "fixed_lr": 1e-4,
     "smoothing": 0.1,
 }
 
