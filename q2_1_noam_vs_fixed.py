@@ -20,7 +20,7 @@ from train import LabelSmoothingLoss, run_epoch, save_checkpoint
 
 BASE_CONFIG = {
     "batch_size": 64,
-    "num_epochs": 20,
+    "num_epochs": 10,
     "d_model": 512,
     "N": 6,
     "num_heads": 8,
